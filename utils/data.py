@@ -16,7 +16,7 @@ n_mfcc_mel = 128           # number of extracted coefficients
 n_mfcc = 13
 hop_length = 512      # the amount we shift with each fft
 
-number_of_segments = 15      # the number of segments we want to split each track
+number_of_segments = 10      # the number of segments we want to split each track
 samples_per_track = sample_rate * duration  # how many samples do we get from each track
 samples_per_segment=int(samples_per_track/number_of_segments)    # how many samples are there in a segment
 num_mfcc_vectors_per_segment = math.ceil(samples_per_segment / hop_length)   # this is to check if the output has the correct dimensions

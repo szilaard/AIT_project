@@ -1,5 +1,5 @@
 from utils.layers import *
-from tensorflow.keras.layers import Input, Dense, Dropout, GlobalAvgPool1D
+from tensorflow.keras.layers import Input, Dense, Dropout, GlobalAvgPool1D, Conv1D
 from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.python.framework import ops
@@ -33,9 +33,9 @@ def transformer_classifier(
     maximum_position_encoding=130,
     n_classes=10,
 ):
-    inp = Input(shape=(maximum_position_encoding, d_model))
+    inp = Input(shape=(None, d_model))
 
-    encoder = Encoder(
+    encoder1 = Encoder(
         num_layers=num_layers,
         d_model=d_model,
         num_heads=num_heads,
@@ -44,9 +44,35 @@ def transformer_classifier(
         rate=0.3,
     )
 
-    x = encoder(inp)
+    encoder2 = Encoder(
+        num_layers=num_layers,
+        d_model=d_model,
+        num_heads=num_heads,
+        dff=dff,
+        maximum_position_encoding=maximum_position_encoding,
+        rate=0.3,
+    )
+
+    encoder3 = Encoder(
+        num_layers=num_layers,
+        d_model=d_model,
+        num_heads=num_heads,
+        dff=dff,
+        maximum_position_encoding=maximum_position_encoding,
+        rate=0.3,
+    )
+
+    x = encoder1(inp)
+    y = encoder2(inp)
+    z = encoder3(inp)
     x = Dropout(0.2)(x)
-    x = GlobalAvgPool1D()(x)
+    y = Dropout(0.2)(y)
+    z = Dropout(0.2)(z)
+    x = x + y + z
+    x = tf.expand_dims(x, axis=-1)
+    x = Conv2D(filters=128, kernel_size=3, activation="selu", padding='valid')(x)
+    x = Conv2D(filters=64, kernel_size=3, activation="selu", padding='valid')(x)
+    x = GlobalAvgPool2D()(x)
     x = Dense(6 * n_classes, activation="selu")(x)
     x = Dropout(0.2)(x)
     out = Dense(n_classes, activation="softmax")(x)

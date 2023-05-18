@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Music genre predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Music genre predictor</h1>
+    
+    <form action="/load_video" method="POST">
+        <label for="video-url">Enter youtube video URL:</label>
+        <input type="text" id="video-url" name="video-url" required>
+        <button type="submit">Predict genre</button>
+    </form>
+    {% if genre and title %}
+    <div>
+        <p>Title: <span id="title">{{ title }}</span></p>
+    </div>
+    <div>
+        <p>Genre: <span id="genre">{{ genre }}</span></p>
+    </div>
+    {% endif %}
+</body>
+</html>
